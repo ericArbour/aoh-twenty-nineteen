@@ -35,6 +35,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - aoh-twenty-nineteen
+    - monad-loops
 
 tests:
   aoh-twenty-nineteen-test:
