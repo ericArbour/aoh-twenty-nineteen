@@ -24,11 +24,22 @@ getInputs filePath = do
         return $ read input
     return inputs
 
-calc :: Integer -> Integer
-calc = (subtract 2) . (`div` 3)
+calcFuelForMass :: Integer -> Integer
+calcFuelForMass = (subtract 2) . (`div` 3)
+
+calcFuelForFuelMass :: Integer -> Integer
+calcFuelForFuelMass fuelMass =
+  if fuelForFuel <= 0
+    then fuelMass
+    else fuelMass + (calcFuelForFuelMass fuelForFuel)
+  where
+    fuelForFuel = calcFuelForMass fuelMass
 
 main :: IO ()
 main = do
-  inputs <- getInputs "src/Day01/input.txt"
-  let answer = sum $ map calc inputs
-  putStrLn $ show answer
+  moduleMasses <- getInputs "src/Day01/input.txt"
+  let moduleFuelMasses = map calcFuelForMass moduleMasses
+      partOneAnswer = sum moduleFuelMasses
+      partTwoAnswer = sum $ map calcFuelForFuelMass moduleFuelMasses
+  putStrLn $ show partOneAnswer
+  putStrLn $ show partTwoAnswer
