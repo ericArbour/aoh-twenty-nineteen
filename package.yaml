@@ -36,6 +36,7 @@ executables:
     dependencies:
     - aoh-twenty-nineteen
     - monad-loops
+    - split
 
 tests:
   aoh-twenty-nineteen-test:

@@ -1,28 +1,6 @@
 module Day01.Solution where
 
-import Control.Monad.Loops (whileM)
-import System.IO
-  ( FilePath
-  , Handle()
-  , IOMode(ReadMode)
-  , hGetLine
-  , hIsEOF
-  , withFile
-  )
-
-checkEOF :: Handle -> IO Bool
-checkEOF inputHandle = do
-  isEOF <- hIsEOF inputHandle
-  return $ not isEOF
-
-getInputs :: FilePath -> IO [Integer]
-getInputs filePath = do
-  withFile filePath ReadMode $ \inputHandle -> do
-    inputs <-
-      whileM (checkEOF inputHandle) $ do
-        input <- hGetLine inputHandle
-        return $ read input
-    return inputs
+import Shared (getLines)
 
 calcFuelForMass :: Integer -> Integer
 calcFuelForMass = (subtract 2) . (`div` 3)
@@ -37,8 +15,9 @@ calcFuelForFuelMass fuelMass =
 
 main :: IO ()
 main = do
-  moduleMasses <- getInputs "src/Day01/input.txt"
-  let moduleFuelMasses = map calcFuelForMass moduleMasses
+  lines <- getLines "src/Day01/input.txt"
+  let moduleMasses = map read lines
+      moduleFuelMasses = map calcFuelForMass moduleMasses
       partOneAnswer = sum moduleFuelMasses
       partTwoAnswer = sum $ map calcFuelForFuelMass moduleFuelMasses
   putStrLn $ show partOneAnswer
