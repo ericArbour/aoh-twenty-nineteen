@@ -1,4 +1,4 @@
-module Day01.Solution where
+module Day01.Solution (main) where
 
 import Shared (getLines)
 

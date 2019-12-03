@@ -1,4 +1,4 @@
-module Day02.Solution where
+module Day02.Solution (main) where
 
 import Data.List (find)
 import Data.List.Split (splitOn)
