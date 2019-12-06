@@ -26,42 +26,79 @@ parseOpCodeAndModes n = (read opcode, read [p1m], read [p2m], read [p3m])
         else s
     (p3m:p2m:p1m:opcode) = padLeft5 $ show n
 
-runInstruction :: Int -> ([Int], [Int]) -> ([Int], [Int])
-runInstruction pointer (xs, outputs) =
+runInstruction :: Int -> Int -> ([Int], [Int]) -> ([Int], [Int])
+runInstruction input pointer (xs, outputs) =
   case opcode of
     99 -> (xs, outputs)
-    1 -> 
-      runInstruction nextPointer (updateAt target (value1 + value2) xs, outputs)
+    1 ->
+      runInstruction
+        input
+        (pointer + 4)
+        (updateAt param3 (value1 + value2) xs, outputs)
     2 ->
-      runInstruction nextPointer (updateAt target (value1 * value2) xs, outputs)
-    3 -> runInstruction nextPointer (updateAt param1 1 xs, outputs)
-    4 -> runInstruction nextPointer (xs, value1 : outputs)
-    otherwise -> error $ "Invalid opcode: " <> show opcode <> " " <> show opcodenmodes
+      runInstruction
+        input
+        (pointer + 4)
+        (updateAt param3 (value1 * value2) xs, outputs)
+    3 -> runInstruction input (pointer + 2) (updateAt param1 input xs, outputs)
+    4 -> runInstruction input (pointer + 2) (xs, value1 : outputs)
+    5 ->
+      runInstruction
+        input
+        (if value1 /= 0
+           then value2
+           else pointer + 3)
+        (xs, outputs)
+    6 ->
+      runInstruction
+        input
+        (if value1 == 0
+           then value2
+           else pointer + 3)
+        (xs, outputs)
+    7 ->
+      runInstruction
+        input
+        (pointer + 4)
+        ( updateAt
+            param3
+            (if value1 < value2
+               then 1
+               else 0)
+            xs
+        , outputs)
+    8 ->
+      runInstruction
+        input
+        (pointer + 4)
+        ( updateAt
+            param3
+            (if value1 == value2
+               then 1
+               else 0)
+            xs
+        , outputs)
+    otherwise -> error $ "Invalid opcode: " <> show opcode
   where
     opcodenmodes = xs !! pointer
-    (opcode,p1m,p2m,p3m) = parseOpCodeAndModes opcodenmodes
+    (opcode, p1m, p2m, p3m) = parseOpCodeAndModes opcodenmodes
     param1 = xs !! (pointer + 1)
     param2 = xs !! (pointer + 2)
-    value1 = if p1m == 0 then xs !! param1 else param1
-    value2 = if p2m == 0 then xs !! param2 else param2
-    target = xs !! (pointer + 3)
-    nextPointer =
-      if opcode == 3 || opcode == 4
-        then pointer + 2
-        else pointer + 4
-
-compute :: [Int] -> ([Int], [Int])
-compute programState = runInstruction 0 (programState, [])
-
-nounVerbPairs :: [(Int, Int)]
-nounVerbPairs = do
-  noun <- [0 .. 99]
-  verb <- [0 .. 99]
-  return (noun, verb)
+    value1 =
+      if p1m == 0
+        then xs !! param1
+        else param1
+    value2 =
+      if p2m == 0
+        then xs !! param2
+        else param2
+    param3 = xs !! (pointer + 3)
 
 main :: IO ()
 main = do
   [input] <- getLines "src/Day05/input.txt"
   let parsedInput = parseInput input
-      part1Answer = compute parsedInput
+      part1Answer = head . snd $ runInstruction 1 0 (parsedInput, [])
+      part2Answer = head . snd $ runInstruction 5 0 (parsedInput, [])
   print part1Answer
+  print part2Answer
