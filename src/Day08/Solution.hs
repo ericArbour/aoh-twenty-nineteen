@@ -1,7 +1,8 @@
 module Day08.Solution (main) where
 
-import Data.List (minimumBy)
-import Data.List.Split (divvy)
+import Data.List (find, intercalate, minimumBy, transpose)
+import Data.List.Split (chunksOf)
+import Data.Maybe (catMaybes)
 
 import Shared (getLines)
 
@@ -17,19 +18,30 @@ imageL = imageW * imageH
 countX :: Int -> [Int] -> Int
 countX x = length . filter (==x)
 
-getImages :: Int -> String -> [[Int]]
-getImages n = map (map charToInt) . divvy n n
+getLayers :: Int -> String -> [[Int]]
+getLayers n = map (map charToInt) . chunksOf n
   where charToInt = read . (:[])
 
 findFewest0s :: [[Int]] -> [Int]
 findFewest0s = minimumBy (\a b -> count0s a `compare` count0s b)
   where count0s = countX 0
 
+placeLayers :: [[Int]] -> [Int]
+placeLayers = catMaybes . map (find (\x -> x == 0 || x == 1)) . transpose
+
+getImage :: [Int] -> String
+getImage = intercalate "\n" . chunksOf imageW . map draw
+  where draw x = if x == 0 then ' ' else 'X'
+
 main :: IO ()
 main = do
   [input] <- getLines "src/Day08/input.txt"
-  let images = getImages imageL input
-      fewest0s = findFewest0s images
+  let layers = getLayers imageL input
+      fewest0s = findFewest0s layers
       oneCount = countX 1 fewest0s
       twoCount = countX 2 fewest0s
-  print $ oneCount * twoCount
+      part1Answer = oneCount * twoCount
+      part2Answer = getImage $ placeLayers layers
+  print part1Answer
+  putStrLn part2Answer
+  
