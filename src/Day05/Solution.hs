@@ -2,9 +2,7 @@ module Day05.Solution
   ( main
   ) where
 
-import Data.List (find)
 import Data.List.Split (splitOn)
-import Data.Maybe (fromJust)
 
 import Shared (getLines)
 
@@ -13,9 +11,6 @@ parseInput = map read . splitOn ","
 
 updateAt :: Int -> a -> [a] -> [a]
 updateAt n x xs = take n xs ++ [x] ++ drop (n + 1) xs
-
-initializeMemory :: Int -> Int -> [Int] -> [Int]
-initializeMemory noun verb = updateAt 2 verb . updateAt 1 noun
 
 parseOpCodeAndModes :: Int -> (Int, Int, Int, Int)
 parseOpCodeAndModes n = (read opcode, read [p1m], read [p2m], read [p3m])
