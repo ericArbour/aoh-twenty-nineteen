@@ -1,3 +1,6 @@
+-- Thanks to Michael Gilliland
+-- https://www.youtube.com/watch?v=55ZWC5sSPMI
+
 module Day07.Solution
   ( main
   ) where
